@@ -1,0 +1,2 @@
+#define SFMLPaddleball_VERSION_MAJOR ${SFMLPaddleball_VERSION_MAJOR}
+#define SFMLPaddleball_VERSION_MINOR ${SFMLPaddleball_VERSION_MINOR}
