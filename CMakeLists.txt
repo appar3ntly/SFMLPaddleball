@@ -42,3 +42,9 @@ if (SFML_FOUND)
   include_directories(${SFML_INCLUDE_DIR})
   target_link_libraries(${EXECUTABLE_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 endif()
+
+# Copy assets folder to build directory.
+add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                   ${PROJECT_SOURCE_DIR}/assets
+                   ${PROJECT_BINARY_DIR})
