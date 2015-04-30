@@ -49,5 +49,6 @@ add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
                    ${PROJECT_SOURCE_DIR}/assets
                    ${PROJECT_BINARY_DIR})
 
-install(TARGETS ${EXECUTABLE_NAME}
-        DESTINATION bin)
+install(TARGETS ${EXECUTABLE_NAME})
+
+install(DIRECTORY ${PROJECT_BINARY_DIR}/assets)
