@@ -4,8 +4,7 @@
 
 #include "SFMLPaddleball/paddle.hpp"
 
-Paddle::Paddle(float width, float height, float move_speed) :
-        move_speed_(move_speed),
+Paddle::Paddle(float width, float height) :
         paddle_shape_(sf::Vector2f(width, height))
 {
     paddle_shape_.setFillColor(sf::Color::Red);
@@ -36,30 +35,14 @@ void Paddle::setPosition(const sf::Vector2f& position)
     paddle_shape_.setPosition(position);
 }
 
-Paddle::PADDLE_DIRECTION Paddle::getMovement() const
+float Paddle::getVSpeed() const
 {
-    if (vspeed_ > 0)
-        return Paddle::PADDLE_DIRECTION::DOWN;
-    else if (vspeed_ < 0)
-        return Paddle::PADDLE_DIRECTION::UP;
-    else
-        return Paddle::PADDLE_DIRECTION::NONE;
+    return vspeed_;
 }
 
-void Paddle::setMovement(Paddle::PADDLE_DIRECTION direction)
+void Paddle::setVSpeed(float vspeed)
 {
-    switch (direction)
-    {
-        case Paddle::PADDLE_DIRECTION::UP:
-            vspeed_ = -move_speed_;
-            break;
-        case Paddle::PADDLE_DIRECTION::DOWN:
-            vspeed_ = move_speed_;
-            break;
-        case Paddle::PADDLE_DIRECTION::NONE:
-            vspeed_ = 0.0;
-            break;
-    }
+    vspeed_ = vspeed;
 }
 
 sf::Rect<float> Paddle::getBoundingBox() const

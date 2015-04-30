@@ -55,6 +55,8 @@ private:
     Paddle paddle1_;
     Paddle paddle2_;
 
+    float paddle_speed_;
+
     Ball ball_;
 
     int p1_score_;
@@ -67,7 +69,8 @@ private:
 
     void update(float delta_t);
     void draw();
-    void setup();
+    void setupNewRound();
+    void checkForScore();
     void collisionChecks();
     void processPaddleMovements();
 };

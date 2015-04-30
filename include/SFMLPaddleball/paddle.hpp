@@ -15,26 +15,13 @@ class Paddle
 {
 public:
     ///////////////////////////////////////////////////////////
-    /// \brief Possible movement states for a Paddle.
-    ///
-    ///////////////////////////////////////////////////////////
-    enum PADDLE_DIRECTION
-    {
-        UP,    ///< Paddle moving towards top of window.
-        DOWN,  ///< Paddle moving towards bottom of window.
-        NONE   ///< Paddle idle.
-    };
-
-    ///////////////////////////////////////////////////////////
     /// \brief Construct a new Paddle.
     ///
     /// \param width      The width of the paddle in pixels.
     /// \param height     The height of the paddle in pixels.
-    /// \param move_speed The movement speed of the paddle in
-    ///                   approximate pixels per second.
     ///
     ///////////////////////////////////////////////////////////
-    Paddle(float width, float height, float move_speed);
+    Paddle(float width, float height);
 
     ~Paddle();
 
@@ -71,20 +58,20 @@ public:
     void setPosition(const sf::Vector2f& position);
 
     ///////////////////////////////////////////////////////////
-    /// \brief Get the current PADDLE_DIRECTION of the Paddle.
+    /// \brief Get the current vertical speed of the Paddle.
     ///
-    /// \return The PADDLE_DIRECTION of the Paddle.
+    /// \return The vertical speed of the Paddle.
     ///
     ///////////////////////////////////////////////////////////
-    PADDLE_DIRECTION getMovement() const;
+    float getVSpeed() const;
 
     ///////////////////////////////////////////////////////////
-    /// \brief Set the current PADDLE_DIRECTION of the Paddle.
+    /// \brief Set the current vertical speed of the Paddle.
     ///
-    /// \param direction  The new Paddle PADDLE_DIRECTION.
+    /// \param direction  The new Paddle vertical speed.
     ///
     ///////////////////////////////////////////////////////////
-    void setMovement(PADDLE_DIRECTION direction);
+    void setVSpeed(float vspeed);
 
     ///////////////////////////////////////////////////////////
     /// \brief Get a bounding box containing the Paddle.
@@ -95,7 +82,6 @@ public:
     sf::Rect<float> getBoundingBox() const;
 
 private:
-    float move_speed_;
     float vspeed_;
     sf::RectangleShape paddle_shape_;
 

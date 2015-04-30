@@ -36,20 +36,17 @@ void Ball::bouncePaddle(const Paddle& paddle)
     hspeed_ *= -1.05;
 
     // Impart some of paddle momentum on to ball.
-    Paddle::PADDLE_DIRECTION paddle_direction = paddle.getMovement();
+    float paddle_speed = paddle.getVSpeed();
 
-    switch (paddle_direction)
-    {
-        case Paddle::PADDLE_DIRECTION::DOWN:
-            vspeed_ += 100.0;
-            break;
-        case Paddle::PADDLE_DIRECTION::UP:
-            vspeed_ -= 100.0;
-            break;
-        default:
-            // If stationary, don't modify vspeed but add additional hspeed
-            hspeed_ *= 1.05;
-    }
+    // Paddle moving down.
+    if (paddle_speed > 0)
+        vspeed_ += 100.0;
+    // Paddle moving up.
+    else if (paddle_speed < 0)
+        vspeed_ -= 100.0;
+    // Paddle stationary.
+    else
+        hspeed_ *= 1.05;
 }
 
 void Ball::bounceWall()

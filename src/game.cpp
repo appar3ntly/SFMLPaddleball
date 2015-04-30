@@ -3,15 +3,17 @@
 //
 
 #include "SFMLPaddleball/game.hpp"
+#include <thread>
 
 Game::Game() :
     ball_(10.0, 150.0, 150.0),
-    paddle1_(10.0, 60.0, 600.0),
-    paddle2_(10.0, 60.0, 600.0),
+    paddle1_(10.0, 60.0),
+    paddle2_(10.0, 60.0),
+    paddle_speed_(600.0),
     p1_score_(0),
     p2_score_(0)
 {
-    render_window_.create(sf::VideoMode(800, 600), "Pong");
+    render_window_.create(sf::VideoMode(800, 600), "SFMLPaddleball");
     score_font_.loadFromFile("assets/fonts/digital-7 (mono).ttf");
 
     // Configure text for player scores.
@@ -43,6 +45,10 @@ void Game::start()
     // Start game state management in GAME_START
     game_state_ = Game::STATE::GAME_START;
 
+    // Start drawing thread.
+    render_window_.setActive(false);
+    std::thread draw_thread(&Game::draw, this);
+
     while (render_window_.isOpen())
     {
         // Window poll loop.
@@ -52,16 +58,24 @@ void Game::start()
             if (event.type == sf::Event::Closed)
             {
                 render_window_.close();
+                draw_thread.join();
                 return;
             }
 
             if (event.type == sf::Event::KeyPressed)
             {
-                if (event.key.code == sf::Keyboard::Escape)
-                    if (game_state_ == Game::STATE::PLAYING)
-                        game_state_ = Game::STATE::PAUSED;
-                    else if (game_state_ == Game::STATE::PAUSED)
-                        game_state_ = Game::STATE::PLAYING;
+                if (event.key.code == sf::Keyboard::Key::Escape)
+                {
+                    switch (game_state_)
+                    {
+                        case Game::STATE::PLAYING:
+                            game_state_ = Game::STATE::PAUSED;
+                            break;
+                        case Game::STATE::PAUSED:
+                            game_state_ = Game::STATE::PLAYING;
+                            break;
+                    }
+                }
             }
 
             if (event.type == sf::Event::LostFocus)
@@ -80,7 +94,7 @@ void Game::start()
                 game_state_ = Game::STATE::ROUND_START;
                 break;
             case Game::STATE::ROUND_START:
-                setup();
+                setupNewRound();
                 game_state_ = Game::STATE::PLAYING;
                 break;
             case Game::STATE::PLAYING:
@@ -88,6 +102,8 @@ void Game::start()
                 processPaddleMovements();
                 // Call update method to update game object positions.
                 update(elapsed_time);
+                // Check if a player has scored.
+                checkForScore();
                 // Check collisions.
                 collisionChecks();
                 break;
@@ -101,14 +117,6 @@ void Game::start()
                 game_state_ = Game::STATE::GAME_START;
                 break;
         }
-
-        if (game_state_ == PLAYING)
-        {
-
-        }
-
-        // Draw
-        draw();
     }
 }
 
@@ -123,22 +131,25 @@ void Game::update(float delta_t)
 
 void Game::draw()
 {
-    render_window_.clear(sf::Color::Black);
+    while (render_window_.isOpen())
+    {
+        render_window_.clear(sf::Color::Black);
 
-    ball_.draw(render_window_);
-    paddle1_.draw(render_window_);
-    paddle2_.draw(render_window_);
+        ball_.draw(render_window_);
+        paddle1_.draw(render_window_);
+        paddle2_.draw(render_window_);
 
-    render_window_.draw(p1_score_text_);
-    render_window_.draw(p2_score_text_);
+        render_window_.draw(p1_score_text_);
+        render_window_.draw(p2_score_text_);
 
-    if (game_state_ == Game::STATE::PAUSED)
-        render_window_.draw(pause_text_);
+        if (game_state_ == Game::STATE::PAUSED)
+            render_window_.draw(pause_text_);
 
-    render_window_.display();
+        render_window_.display();
+    }
 }
 
-void Game::setup()
+void Game::setupNewRound()
 {
     // Reset positions and movement characteristics of paddles and ball.
     paddle1_.setPosition(sf::Vector2f(60.0, render_window_.getSize().y / 2));
@@ -149,7 +160,7 @@ void Game::setup()
     ball_.resetMovement();
 }
 
-void Game::collisionChecks()
+void Game::checkForScore()
 {
     // Check for ball outside of play area.
     sf::Vector2f ball_position = ball_.getPosition();
@@ -165,8 +176,12 @@ void Game::collisionChecks()
 
         return;
     }
+}
 
+void Game::collisionChecks()
+{
     // Check for ball colliding with top or bottom of screen.
+    sf::Vector2f ball_position = ball_.getPosition();
     if (ball_position.y < 0 || ball_position.y + ball_.getDiameter() > render_window_.getSize().y)
         ball_.bounceWall();
 
@@ -191,28 +206,28 @@ void Game::processPaddleMovements()
     // Process input for player one.
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         if (paddle1_position.y > 0)
-            paddle1_.setMovement(Paddle::PADDLE_DIRECTION::UP);
+            paddle1_.setVSpeed(-paddle_speed_);
         else
-            paddle1_.setMovement(Paddle::PADDLE_DIRECTION::NONE);
+            paddle1_.setVSpeed(0);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         if (paddle1_position.y + paddle1_.getBoundingBox().height < render_window_.getSize().y)
-            paddle1_.setMovement(Paddle::PADDLE_DIRECTION::DOWN);
+            paddle1_.setVSpeed(paddle_speed_);
         else
-            paddle1_.setMovement(Paddle::PADDLE_DIRECTION::NONE);
+            paddle1_.setVSpeed(0);
     else
-        paddle1_.setMovement(Paddle::PADDLE_DIRECTION::NONE);
+        paddle1_.setVSpeed(0);
 
     // Process input for player two.
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         if (paddle2_position.y > 0)
-            paddle2_.setMovement(Paddle::PADDLE_DIRECTION::UP);
+            paddle2_.setVSpeed(-paddle_speed_);
         else
-            paddle2_.setMovement(Paddle::PADDLE_DIRECTION::NONE);
+            paddle2_.setVSpeed(0);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         if (paddle2_position.y + paddle2_.getBoundingBox().height < render_window_.getSize().y)
-            paddle2_.setMovement(Paddle::PADDLE_DIRECTION::DOWN);
+            paddle2_.setVSpeed(paddle_speed_);
         else
-            paddle2_.setMovement(Paddle::PADDLE_DIRECTION::NONE);
+            paddle2_.setVSpeed(0);
     else
-        paddle2_.setMovement(Paddle::PADDLE_DIRECTION::NONE);
+        paddle2_.setVSpeed(0);
 }
