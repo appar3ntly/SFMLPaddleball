@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 2.8)
 project(SFMLPaddleball)
 
 add_subdirectory(doc)
@@ -20,7 +20,7 @@ configure_file(
 )
 
 # Configure SFML build
-set(SFML_STATIC_LIBRARIES TRUE)
+set(SFML_STATIC_LIBRARIES FALSE)
 set(SFML_ROOT "C:/Program Files/SFML")
 
 # Detect and find SFML
