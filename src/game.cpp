@@ -14,7 +14,7 @@ Game::Game() :
     p2_score_(0)
 {
     render_window_.create(sf::VideoMode(800, 600), "SFMLPaddleball");
-    score_font_.loadFromFile("assets/fonts/digital-7 (mono).ttf");
+    score_font_.loadFromFile("fonts/digital-7 (mono).ttf");
 
     // Configure text for player scores.
     p1_score_text_.setFont(score_font_);
